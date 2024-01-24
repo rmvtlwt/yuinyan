@@ -1,0 +1,23 @@
+{
+	"deploy": {
+		"include": [
+			"main.ts"
+		]
+	},
+	"lint": {
+		"rules": {
+			"tags": [
+				"recommended"
+			],
+			"include": [
+				"ban-untagged-todo",
+				"camelcase"
+			]
+		}
+	},
+	"fmt": {
+		"semiColons": true,
+		"useTabs": true,
+		"indentWidth": 4
+	}
+}
