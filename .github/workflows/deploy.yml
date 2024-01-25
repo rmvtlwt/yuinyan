@@ -15,7 +15,7 @@ permissions:
 
 env:
   DENO_DEPLOY_TOKEN: ${{ secrets.DENO_DEPLOY_TOKEN }}
-  PROJECT: ${{ (github.event_name == 'push' && github.ref_name == github.event.repository.default_branch) && secrets.PRODUCTIOM_PROJECT || secrets.PREVIEW_PROJECT }}
+  PROJECT: ${{ (github.event_name == 'push' && github.ref_name == github.event.repository.default_branch) && secrets.PRODUCTION_PROJECT || secrets.PREVIEW_PROJECT }}
 
 jobs:
   build-and-deploy:
