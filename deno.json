@@ -5,7 +5,8 @@
 			"*.md",
 			"tests/**",
 			"LICENSE"
-		]
+		],
+		"entrypoint": "main.ts"
 	},
 	"imports": {
 		"@discordjs/rest": "npm:@discordjs/rest",
