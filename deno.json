@@ -1,13 +1,17 @@
 {
 	"deploy": {
-		"include": [
-			"main.ts"
-		]
+		"exclude": [
+			".*/**",
+			"*.md",
+			"tests/**",
+			"LICENSE"
+		],
+		"entrypoint": "main.ts"
 	},
 	"imports": {
 		"@discordjs/rest": "npm:@discordjs/rest",
 		"discord_api_types": "https://deno.land/x/discord_api_types@0.37.67/v10.ts",
-		"std": "https://deno.land/std@0.213.0"
+		"std/": "https://deno.land/std@0.213.0/"
 	},
 	"lint": {
 		"rules": {
@@ -26,6 +30,7 @@
 		"indentWidth": 4
 	},
 	"tasks": {
-		"build": "deno lint && deno check main.ts && deno fmt --check"
+		"build": "deno lint && deno check main.ts && deno fmt --check",
+		"test": "deno run -A --check main.ts"
 	}
 }
