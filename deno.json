@@ -1,7 +1,8 @@
 {
 	"deploy": {
 		"include": [
-			"main.ts"
+			"deno.*",
+			"*/**.ts"
 		]
 	},
 	"imports": {
