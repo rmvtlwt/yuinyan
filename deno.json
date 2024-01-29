@@ -1,8 +1,10 @@
 {
 	"deploy": {
-		"include": [
-			"deno.*",
-			"*/**.ts"
+		"exclude": [
+			".*/**",
+			"*.md",
+			"tests/**",
+			"LICENSE"
 		]
 	},
 	"imports": {
