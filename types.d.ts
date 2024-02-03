@@ -5,7 +5,7 @@ import type {
 	RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "discord_api_types";
 
-export interface Command<
+export interface ICommand<
 	Data extends RESTPostAPIApplicationCommandsJSONBody,
 	Interaction extends APIApplicationCommandInteraction,
 > {
@@ -13,7 +13,10 @@ export interface Command<
 	execute(interaction: Interaction): void | Promise<void>;
 }
 
-export type ChatInputCommand = Command<
-	RESTPostAPIChatInputApplicationCommandsJSONBody,
+export type ChatInputCommand = ICommand<
+	& Required<Pick<RESTPostAPIChatInputApplicationCommandsJSONBody, "type">>
+	& RESTPostAPIChatInputApplicationCommandsJSONBody,
 	APIChatInputApplicationCommandInteraction
 >;
+
+export type Command = ChatInputCommand;
