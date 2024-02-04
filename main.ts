@@ -11,7 +11,12 @@ import {
 import { REST } from "@discordjs/rest";
 
 import manifestGen from "./manifest.gen.ts";
-import { isChatInput, isCommand, isPing, stringToBoolean } from "./utils/mod.ts"
+import {
+	isChatInput,
+	isCommand,
+	isPing,
+	stringToBoolean,
+} from "./utils/mod.ts";
 
 async function handler(request: Request): Promise<Response> {
 	const requestUrl = new URL(request.url);
