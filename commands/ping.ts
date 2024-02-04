@@ -10,7 +10,7 @@ export default {
 		description: "Ngetes aja banh 🐊",
 		type: ApplicationCommandType.ChatInput,
 	},
-	execute(_interaction) {
+	execute(_options) {
 		return Response.json({
 			type: InteractionResponseType.ChannelMessageWithSource,
 			data: { content: "Nggih 🐊" },
