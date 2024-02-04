@@ -10,11 +10,8 @@ import {
 } from "discord_api_types";
 import { REST } from "@discordjs/rest";
 
-import { isChatInput } from "./utils/command.ts";
-import { stringToBoolean } from "./utils/convert.ts";
-import { isCommand, isPing } from "./utils/interaction.ts";
-
 import manifestGen from "./manifest.gen.ts";
+import { isChatInput, isCommand, isPing, stringToBoolean } from "./utils/mod.ts"
 
 async function handler(request: Request): Promise<Response> {
 	const requestUrl = new URL(request.url);
