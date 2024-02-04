@@ -11,7 +11,7 @@
 	"imports": {
 		"@discordjs/rest": "npm:@discordjs/rest",
 		"discord_api_types": "https://deno.land/x/discord_api_types@0.37.67/v10.ts",
-		"std/": "https://deno.land/std@0.213.0/"
+		"std/": "https://deno.land/std@0.214.0/"
 	},
 	"lint": {
 		"rules": {
@@ -22,15 +22,21 @@
 				"ban-untagged-todo",
 				"camelcase"
 			]
-		}
+		},
+		"exclude": [
+			"manifest.gen.ts"
+		]
 	},
 	"fmt": {
 		"semiColons": true,
 		"useTabs": true,
-		"indentWidth": 4
+		"indentWidth": 4,
+		"exclude": [
+			"manifest.gen.ts"
+		]
 	},
 	"tasks": {
-		"build": "deno lint && deno check main.ts && deno fmt --check",
+		"build": "deno run --allow-read --allow-write --allow-run --check build.ts",
 		"test": "deno run -A --check main.ts"
 	}
 }

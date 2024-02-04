@@ -31,10 +31,13 @@ jobs:
         with:
           deno-version: v1.x
 
+      - name: Run Build
+        run: deno task build
+
       - name: Verify formatting
         run: |
           deno lint
-          deno check main.ts
+          deno check -q main.ts
           deno fmt --check
 
       - name: Deploy
