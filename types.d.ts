@@ -1,10 +1,6 @@
 import type {
 	APIApplicationCommandInteraction,
 	APIChatInputApplicationCommandInteraction,
-	APIInteractionResponse,
-	APIInteractionResponseChannelMessageWithSource,
-	APIInteractionResponseDeferredChannelMessageWithSource,
-	APIModalInteractionResponse,
 	RESTPostAPIApplicationCommandsJSONBody,
 	RESTPostAPIChatInputApplicationCommandsJSONBody,
 } from "discord_api_types";
@@ -12,21 +8,19 @@ import type {
 export interface ICommand<
 	Data extends RESTPostAPIApplicationCommandsJSONBody,
 	Interaction extends APIApplicationCommandInteraction,
-	ResponseType extends APIInteractionResponse,
 > {
 	data: Data;
-	execute(interaction: Interaction): ResponseType | Promise<ResponseType>;
+	execute(interaction: Interaction): Response | Promise<Response>;
 }
 
 export type ChatInputCommand = ICommand<
 	& Required<Pick<RESTPostAPIChatInputApplicationCommandsJSONBody, "type">>
 	& RESTPostAPIChatInputApplicationCommandsJSONBody,
-	APIChatInputApplicationCommandInteraction,
-	(
-		| APIInteractionResponseChannelMessageWithSource
-		| APIInteractionResponseDeferredChannelMessageWithSource
-		| APIModalInteractionResponse
-	)
+	APIChatInputApplicationCommandInteraction
 >;
 
 export type Command = ChatInputCommand;
+
+export interface Manifest {
+	commands: Command[];
+}
