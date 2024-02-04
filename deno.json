@@ -37,6 +37,6 @@
 	},
 	"tasks": {
 		"build": "deno run --allow-read --allow-write --allow-run --check build.ts",
-		"test": "deno run -A --check main.ts"
+		"test": "deno run -A --watch --check main.ts"
 	}
 }
