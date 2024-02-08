@@ -70,8 +70,8 @@ export default {
 
 		// TODO(@aureziaa): create edit custom role function
 		switch (subcommand.name) {
-			case "create": {
-				createCustomRole({ ...options, kvKey, subcommand });
+			case "claim": {
+				claimCustomRole({ ...options, kvKey, subcommand });
 				return Response.json({
 					type: InteractionResponseType
 						.DeferredChannelMessageWithSource,
@@ -81,7 +81,7 @@ export default {
 	},
 } as ChatInputCommand;
 
-async function createCustomRole(
+async function claimCustomRole(
 	{
 		interaction,
 		rest,
