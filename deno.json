@@ -25,7 +25,8 @@
 			]
 		},
 		"exclude": [
-			"manifest.gen.ts"
+			"manifest.gen.ts",
+			"tests/"
 		]
 	},
 	"fmt": {

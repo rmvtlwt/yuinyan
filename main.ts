@@ -6,6 +6,7 @@ import {
 	type APIChatInputApplicationCommandInteraction,
 	type APIInteraction,
 	InteractionResponseType,
+	MessageFlags,
 	Routes,
 } from "discord_api_types";
 import { REST } from "@discordjs/rest";
@@ -67,16 +68,19 @@ async function handler(request: Request): Promise<Response> {
 							...opts,
 						});
 					} else {
-						console.log(interaction);
 						return new Response(
 							`Unknowm command type. (${interaction.data.type})`,
 						);
 					}
 				} else {
-					const err = `Command not found.`;
-
-					console.log(err);
-					return new Response(err);
+					return Response.json({
+						type: InteractionResponseType.ChannelMessageWithSource,
+						data: {
+							content:
+								`Wah.. kayaknya command ini ga sinkron nih`,
+							flags: MessageFlags.Ephemeral,
+						},
+					});
 				}
 			} else if (isPing(interaction)) {
 				const updateCommands = stringToBoolean(
@@ -99,7 +103,6 @@ async function handler(request: Request): Promise<Response> {
 					type: InteractionResponseType.Pong,
 				});
 			} else {
-				console.log(interaction);
 				return new Response(
 					`Unknown interaction type. (${interaction.type})`,
 				);
