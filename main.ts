@@ -57,7 +57,7 @@ async function handler(request: Request): Promise<Response> {
 					command.data.name === interaction.data.name &&
 					command.data.type === interaction.data.type
 				);
-				const opts = { rest };
+				const opts = { rest, kv: await Deno.openKv() };
 
 				if (command) {
 					if (isChatInput(command)) {

@@ -20,7 +20,8 @@
 			],
 			"include": [
 				"ban-untagged-todo",
-				"camelcase"
+				"camelcase",
+				"no-console"
 			]
 		},
 		"exclude": [
@@ -38,5 +39,8 @@
 	"tasks": {
 		"build": "deno run --allow-read --allow-write --allow-run --check build.ts",
 		"test": "deno run -A --watch --check main.ts"
-	}
+	},
+	"unstable": [
+		"kv"
+	]
 }
