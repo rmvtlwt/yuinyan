@@ -7,8 +7,8 @@ import {
 	type APIInteraction,
 	InteractionResponseType,
 	MessageFlags,
-	Routes,
 } from "discord_api_types";
+import { API } from "@discordjs/core";
 import { REST } from "@discordjs/rest";
 
 import manifestGen from "./manifest.gen.ts";
@@ -48,8 +48,8 @@ async function handler(request: Request): Promise<Response> {
 		if (!valid) {
 			return invalidRequest;
 		} else {
-			const rest = new REST().setToken(
-				Deno.env.get("DISCORD_TOKEN")!,
+			const api = new API(
+				new REST().setToken(Deno.env.get("DISCORD_TOKEN")!),
 			);
 			const interaction: APIInteraction = JSON.parse(body);
 
@@ -58,7 +58,7 @@ async function handler(request: Request): Promise<Response> {
 					command.data.name === interaction.data.name &&
 					command.data.type === interaction.data.type
 				);
-				const opts = { rest, kv: await Deno.openKv() };
+				const opts = { api, kv: await Deno.openKv() };
 
 				if (command) {
 					if (isChatInput(command)) {
@@ -87,15 +87,9 @@ async function handler(request: Request): Promise<Response> {
 					requestUrl.searchParams.get("updateCommands")!,
 				);
 				if (updateCommands) {
-					await rest.put(
-						Routes.applicationCommands(
-							Deno.env.get("DISCORD_ID")!,
-						),
-						{
-							body: manifestGen.commands.map((command) =>
-								command.data
-							),
-						},
+					await api.applicationCommands.bulkOverwriteGlobalCommands(
+						interaction.application_id,
+						manifestGen.commands.map((command) => command.data),
 					);
 				}
 

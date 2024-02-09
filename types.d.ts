@@ -6,10 +6,10 @@ import type {
 	RESTPostAPIChatInputApplicationCommandsJSONBody,
 	Snowflake,
 } from "discord_api_types";
-import { REST } from "@discordjs/rest";
+import type { API } from "@discordjs/core";
 
 export interface ExecuteOptions<Interaction extends APIInteraction> {
-	rest: REST;
+	api: API;
 	interaction: Interaction;
 	kv: Deno.Kv;
 }

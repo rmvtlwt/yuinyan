@@ -8,13 +8,6 @@ import {
 	GuildFeature,
 	InteractionResponseType,
 	MessageFlags,
-	type RESTGetAPIGuildResult,
-	type RESTGetAPIGuildRolesResult,
-	type RESTPatchAPIGuildRolePositionsJSONBody,
-	type RESTPatchAPIInteractionOriginalResponseJSONBody,
-	type RESTPostAPIGuildRoleJSONBody,
-	type RESTPostAPIGuildRoleResult,
-	Routes,
 } from "discord_api_types";
 import type {
 	ChatInputCommand,
@@ -83,8 +76,8 @@ export default {
 
 async function claimCustomRole(
 	{
+		api,
 		interaction,
-		rest,
 		kv,
 		kvKey,
 		subcommand,
@@ -94,19 +87,16 @@ async function claimCustomRole(
 	},
 ): Promise<void> {
 	const customRoleData = await kv.get<CustomRole>(kvKey);
-	const patchRoute = Routes.webhookMessage(
-		interaction.application_id,
-		interaction.token,
-		"@original",
-	);
 
 	if (customRoleData.value) {
-		return void await rest.patch(patchRoute, {
-			body: {
+		return void await api.interactions.editReply(
+			interaction.application_id,
+			interaction.token,
+			{
 				content:
 					`Kamu udah punya custom role maniez. Kalau ada yang mau diubah, pake \`/custom-role edit\` ya!! Tengkyew`,
 			},
-		});
+		);
 	} else {
 		const [name, color, iconId] = (subcommand
 			.options! as (
@@ -118,22 +108,22 @@ async function claimCustomRole(
 			? (interaction.data.resolved?.attachments!)[iconId]
 			: undefined;
 
-		const guild = await rest.get(
-			Routes.guild(interaction.guild_id!),
-		) as RESTGetAPIGuildResult;
+		const guild = await api.guilds.get(interaction.guild_id!);
 
 		const isEligible = guild.features.includes(
 			GuildFeature.RoleIcons,
 		);
 
 		if (!RegExp(/^#[a-f0-9]{6}$/gi).test(color)) {
-			return void await rest.patch(patchRoute, {
-				body: {
+			return void await api.interactions.editReply(
+				interaction.application_id,
+				interaction.token,
+				{
 					content:
 						`🎐 - Format warna role nya ga valid nih. Coba pilih warna kamu [disini](<https://imagecolorpicker.com/en>)`,
 					flags: MessageFlags.Ephemeral,
 				},
-			});
+			);
 		} else {
 			let iconData;
 
@@ -143,12 +133,14 @@ async function claimCustomRole(
 						icon.content_type!,
 					)
 				) {
-					return void await rest.patch(patchRoute, {
-						body: {
+					return void await api.interactions.editReply(
+						interaction.application_id,
+						interaction.token,
+						{
 							content:
 								`Format file nya salah nih kak.. iconnya harus file \`png\`, \`jpg\` atau \`jpeg\` aja kak, cari file lain yaa.. hehe`,
 						},
-					});
+					);
 				} else {
 					iconData = await fetch(icon.url).then((
 						response,
@@ -157,66 +149,59 @@ async function claimCustomRole(
 			}
 
 			try {
-				const newRole = await rest.post(
-					Routes.guildRoles(interaction.guild_id!),
+				const newRole = await api.guilds.createRole(
+					interaction.guild_id!,
 					{
-						body: {
-							name,
-							color: Number(color.replace("#", "0x")),
-							icon: isEligible
-								? `data:${icon?.content_type};base64,${
-									encodeBase64(iconData!)
-								}`
-								: undefined,
-						} as RESTPostAPIGuildRoleJSONBody,
-					},
-				) as RESTPostAPIGuildRoleResult;
-
-				const guildRoles = await rest.get(
-					Routes.guildRoles(interaction.guild_id!),
-				) as RESTGetAPIGuildRolesResult;
-
-				await rest.patch(
-					Routes.guildRoles(
-						interaction.guild_id!,
-					),
-					{
-						body: [{
-							id: newRole.id,
-							position: guildRoles.find((role) =>
-								role.id ===
-									"1196032785970888765"
-							)!.position,
-						}] as RESTPatchAPIGuildRolePositionsJSONBody,
+						name,
+						color: Number(color.replace("#", "0x")),
+						icon: isEligible
+							? `data:${icon?.content_type};base64,${
+								encodeBase64(iconData!)
+							}`
+							: undefined,
 					},
 				);
+
+				const guildRoles = await api.guilds.getRoles(
+					interaction.guild_id!,
+				);
+
+				await api.guilds.setRolePositions(interaction.guild_id!, [{
+					id: newRole.id,
+					position: guildRoles.find((role) =>
+						role.id ===
+							"1196032785970888765"
+					)!.position,
+				}]);
 
 				await kv.atomic().set(
 					kvKey,
 					{ roleId: newRole.id } as CustomRole,
 				).commit();
 
-				await rest.put(
-					Routes.guildMemberRole(
-						interaction.guild_id!,
-						interaction.member!.user.id,
-						newRole.id,
-					),
+				await api.guilds.addRoleToMember(
+					interaction.guild_id!,
+					interaction.member!.user.id,
+					newRole.id,
 				);
 
-				await rest.patch(patchRoute, {
-					body: {
+				await api.interactions.editReply(
+					interaction.application_id,
+					interaction.token,
+					{
 						content:
 							`Selamat, role kamu berhasil di claim!! <@&${newRole.id}>`,
-					} as RESTPatchAPIInteractionOriginalResponseJSONBody,
-				});
+					},
+				);
 			} catch (_error) {
-				await rest.patch(patchRoute, {
-					body: {
+				await api.interactions.editReply(
+					interaction.application_id,
+					interaction.token,
+					{
 						content:
-							`Umm.. kayaknya ada yang salah deh, silahkan DM developer untuk melaporkan masalah ini, trimakasii ^^`,
-					} as RESTPatchAPIInteractionOriginalResponseJSONBody,
-				});
+							`Umm.. kayaknya ada yang salah deh, silahkan DM developer untuk melaporkan masalah ini`,
+					},
+				);
 			}
 		}
 	}
