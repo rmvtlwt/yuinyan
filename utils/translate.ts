@@ -8,7 +8,10 @@ export function translate(
 	if (translated) {
 		let fixedTranslate = translated;
 		for (const [key, value] of Object.entries(args ?? {})) {
-			fixedTranslate = fixedTranslate.replaceAll(RegExp(`/(?<!\\)\{${key}\}/g`), value);
+			fixedTranslate = fixedTranslate.replaceAll(
+				RegExp(`/(?<!\\)\{${key}\}/g`),
+				value,
+			);
 		}
 
 		return fixedTranslate;
