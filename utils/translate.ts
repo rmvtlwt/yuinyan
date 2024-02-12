@@ -2,7 +2,7 @@ import config from "../config.json" with { type: "json" };
 
 export function translate(
 	key: keyof typeof config.texts,
-	args: Record<string, string>,
+	args?: Record<string, string>,
 ): string {
 	const translated = config.texts[key];
 	if (translated) {

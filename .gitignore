@@ -1,5 +1,5 @@
 # This files will be generated on the build step
 manifest.gen.ts
-config.json
 
+# This files only used for testing function / features
 *_test.ts

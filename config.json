@@ -1,0 +1,11 @@
+{
+	"color": 16777215,
+	"texts": {
+		"custom_role_already_claimed": "Kamu sudah klaim custom role kamu.",
+		"custom_role_creation_invalid_color": "Warna rolenya ga valid nih. Coba cari warna favoritmu di {link}.",
+		"custom_role_creation_invalid_icon": "Icon role hanya mendukung format file `jpg` dan `png`.",
+		"custom_role_creation_success": "Yey!! Custom role kamu sudah jadi. {role}",
+		"custom_role_icon_not_eligible": "Custom role dengan icon hanya tersedia untuk server yang memiliki boost level 2 atau lebih.",
+		"error": "Wah. ada yang salah nih, tunggu sebentar ya. Kami sudah mengirim pesan error ke developer bot untuk diinvestigasi. "
+	}
+}
