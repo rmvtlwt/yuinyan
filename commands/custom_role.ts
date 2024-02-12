@@ -58,6 +58,7 @@ export default {
 		)! as APIApplicationCommandInteractionDataSubcommandOption;
 		const kvKey: Deno.KvKey = [
 			"custom_role",
+			options.interaction.guild_id!,
 			options.interaction.member!.user.id,
 		];
 
@@ -128,23 +129,34 @@ async function claimCustomRole(
 			let iconData;
 
 			if (icon) {
-				if (
-					RegExp(/^image\/(png|jpg|jpeg)$/).test(
-						icon.content_type!,
-					)
-				) {
+				if (isEligible) {
+					if (
+						RegExp(/^image\/(png|jpg|jpeg)$/).test(
+							icon.content_type!,
+						)
+					) {
+						return void await api.interactions.editReply(
+							interaction.application_id,
+							interaction.token,
+							{
+								content:
+									`Format file nya salah nih kak.. iconnya harus file \`png\`, \`jpg\` atau \`jpeg\` aja kak, cari file lain yaa.. hehe`,
+							},
+						);
+					} else {
+						iconData = await fetch(icon.url).then((
+							response,
+						) => response.arrayBuffer());
+					}
+				} else {
 					return void await api.interactions.editReply(
 						interaction.application_id,
 						interaction.token,
 						{
 							content:
-								`Format file nya salah nih kak.. iconnya harus file \`png\`, \`jpg\` atau \`jpeg\` aja kak, cari file lain yaa.. hehe`,
+								"Custom role dengan icon hanya tersedia untuk server dengan boost level 2 (atau lebih)",
 						},
 					);
-				} else {
-					iconData = await fetch(icon.url).then((
-						response,
-					) => response.arrayBuffer());
 				}
 			}
 

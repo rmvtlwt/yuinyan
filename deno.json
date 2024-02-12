@@ -12,7 +12,7 @@
 		"@discordjs/core": "npm:@discordjs/core@1.1.1",
 		"@discordjs/rest": "npm:@discordjs/rest@2.2.0",
 		"discord_api_types": "https://deno.land/x/discord_api_types@0.37.68/v10.ts",
-		"std/": "https://deno.land/std@0.214.0/"
+		"std/": "https://deno.land/std@0.215.0/"
 	},
 	"lint": {
 		"rules": {
@@ -27,7 +27,7 @@
 		},
 		"exclude": [
 			"manifest.gen.ts",
-			"tests/"
+			"*_test.ts"
 		]
 	},
 	"fmt": {
