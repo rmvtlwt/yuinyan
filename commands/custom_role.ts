@@ -15,6 +15,9 @@ import type {
 	ExecuteOptions,
 } from "../types.d.ts";
 
+import config from "../config.json" with { type: "json" };
+
+import { translate } from "../utils/translate.ts";
 import { encodeBase64 } from "std/encoding/base64.ts";
 
 export default {
@@ -94,8 +97,10 @@ async function claimCustomRole(
 			interaction.application_id,
 			interaction.token,
 			{
-				content:
-					`Kamu udah punya custom role maniez. Kalau ada yang mau diubah, pake \`/custom-role edit\` ya!! Tengkyew`,
+				embeds: [{
+					color: config.color,
+					description: translate("custom_role_already_claimed"),
+				}],
 			},
 		);
 	} else {
@@ -120,8 +125,15 @@ async function claimCustomRole(
 				interaction.application_id,
 				interaction.token,
 				{
-					content:
-						`🎐 - Format warna role nya ga valid nih. Coba pilih warna kamu [disini](<https://imagecolorpicker.com/en>)`,
+					embeds: [{
+						color: config.color,
+						description: translate(
+							"custom_role_creation_invalid_color",
+							{
+								link: "https://imagecolorpicker.com/en",
+							},
+						),
+					}],
 					flags: MessageFlags.Ephemeral,
 				},
 			);
@@ -139,8 +151,9 @@ async function claimCustomRole(
 							interaction.application_id,
 							interaction.token,
 							{
-								content:
-									`Format file nya salah nih kak.. iconnya harus file \`png\`, \`jpg\` atau \`jpeg\` aja kak, cari file lain yaa.. hehe`,
+								content: translate(
+									"custom_role_creation_invalid_icon",
+								),
 							},
 						);
 					} else {
@@ -153,8 +166,7 @@ async function claimCustomRole(
 						interaction.application_id,
 						interaction.token,
 						{
-							content:
-								"Custom role dengan icon hanya tersedia untuk server dengan boost level 2 (atau lebih)",
+							content: translate("custom_role_icon_not_eligible"),
 						},
 					);
 				}
@@ -166,7 +178,7 @@ async function claimCustomRole(
 					{
 						name,
 						color: Number(color.replace("#", "0x")),
-						icon: isEligible
+						icon: iconData
 							? `data:${icon?.content_type};base64,${
 								encodeBase64(iconData!)
 							}`
@@ -201,8 +213,15 @@ async function claimCustomRole(
 					interaction.application_id,
 					interaction.token,
 					{
-						content:
-							`Selamat, role kamu berhasil di claim!! <@&${newRole.id}>`,
+						embeds: [{
+							color: config.color,
+							description: translate(
+								"custom_role_creation_success",
+								{
+									role: `<@&${newRole.id}>`,
+								},
+							),
+						}],
 					},
 				);
 			} catch (_error) {
@@ -210,8 +229,10 @@ async function claimCustomRole(
 					interaction.application_id,
 					interaction.token,
 					{
-						content:
-							`Umm.. kayaknya ada yang salah deh, silahkan DM developer untuk melaporkan masalah ini`,
+						embeds: [{
+							color: config.color,
+							description: translate("error"),
+						}],
 					},
 				);
 			}
