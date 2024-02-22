@@ -8,6 +8,7 @@ import {
 	GuildFeature,
 	InteractionResponseType,
 	MessageFlags,
+	type Snowflake,
 } from "discord_api_types";
 import type {
 	ChatInputCommand,
@@ -28,25 +29,51 @@ export default {
 		options: [
 			{
 				name: "claim",
-				description: "Buat peran kustom mu :3",
+				description: "🎐 · Klaim custom role Kamuu :3",
 				type: ApplicationCommandOptionType.Subcommand,
 				options: [
 					{
 						name: "name",
-						description: "Atur nama peran kustom mu :3",
+						description: "🎐 · Atur nama custom role kamu :3",
 						type: ApplicationCommandOptionType.String,
 						required: true,
 					},
 					{
 						name: "color",
 						description:
-							"Atur warna kustom role kamu :3 (contoh: #CE92FF)",
+							"🎐 · Atur warna custom role kamu :3 (contoh: #CE92FF)",
 						type: ApplicationCommandOptionType.String,
 						required: true,
 					},
 					{
 						name: "icon",
-						description: "Atur icon peran kamu :3",
+						description: "🎐 · Atur icon role kamu :3",
+						type: ApplicationCommandOptionType.Attachment,
+						required: false,
+					},
+				],
+			},
+			{
+				name: "update",
+				description: "🎐 · Update custom role kamu",
+				type: ApplicationCommandOptionType.Subcommand,
+				options: [
+					{
+						name: "name",
+						description: "🎐 · Atur nama custom role kamu :3",
+						type: ApplicationCommandOptionType.String,
+						required: false,
+					},
+					{
+						name: "color",
+						description:
+							"🎐 · Atur warna custom role kamu :3 (contoh: #CE92FF)",
+						type: ApplicationCommandOptionType.String,
+						required: false,
+					},
+					{
+						name: "icon",
+						description: "🎐 · Atur icon role kamu :3",
 						type: ApplicationCommandOptionType.Attachment,
 						required: false,
 					},
@@ -59,22 +86,28 @@ export default {
 		const subcommand = options.interaction.data.options?.find((option) =>
 			option.type === ApplicationCommandOptionType.Subcommand
 		)! as APIApplicationCommandInteractionDataSubcommandOption;
-		const kvKey: Deno.KvKey = [
-			"custom_role",
-			options.interaction.guild_id!,
-			options.interaction.member!.user.id,
-		];
 
 		// TODO(@aureziaa): create edit custom role function
+		let action;
 		switch (subcommand.name) {
 			case "claim": {
-				claimCustomRole({ ...options, kvKey, subcommand });
-				return Response.json({
-					type: InteractionResponseType
-						.DeferredChannelMessageWithSource,
-				});
+				action = claimCustomRole;
+				break;
+			}
+			case "update": {
+				action = updateCustomRole;
+				break;
+			}
+			default: {
+				throw new Error(`Unknown subcommand: ${subcommand.name}`);
 			}
 		}
+
+		action({ ...options, subcommand });
+		return Response.json({
+			type: InteractionResponseType
+				.DeferredChannelMessageWithSource,
+		});
 	},
 } as ChatInputCommand;
 
@@ -83,13 +116,16 @@ async function claimCustomRole(
 		api,
 		interaction,
 		kv,
-		kvKey,
 		subcommand,
 	}: ExecuteOptions<APIChatInputApplicationCommandInteraction> & {
-		kvKey: Deno.KvKey;
 		subcommand: APIApplicationCommandInteractionDataSubcommandOption;
 	},
 ): Promise<void> {
+	const kvKey: Deno.KvKey = [
+		"custom_role",
+		interaction.guild_id!,
+		interaction.member!.user.id,
+	];
 	const customRoleData = await kv.get<CustomRole>(kvKey);
 
 	if (customRoleData.value) {
@@ -198,16 +234,16 @@ async function claimCustomRole(
 					)!.position,
 				}]);
 
-				await kv.atomic().set(
-					kvKey,
-					{ roleId: newRole.id } as CustomRole,
-				).commit();
-
 				await api.guilds.addRoleToMember(
 					interaction.guild_id!,
 					interaction.member!.user.id,
 					newRole.id,
 				);
+
+				await kv.atomic().set(
+					kvKey,
+					{ roleId: newRole.id } as CustomRole,
+				).commit();
 
 				await api.interactions.editReply(
 					interaction.application_id,
@@ -218,7 +254,172 @@ async function claimCustomRole(
 							description: translate(
 								"custom_role_creation_success",
 								{
+									emoji: Deno.env.get(
+										"DISCORD_EMOJI_SUCCESS",
+									),
 									role: `<@&${newRole.id}>`,
+								},
+							),
+						}],
+					},
+				);
+			} catch (_error) {
+				await api.interactions.editReply(
+					interaction.application_id,
+					interaction.token,
+					{
+						embeds: [{
+							color: config.color,
+							description: translate("error"),
+						}],
+					},
+				);
+			}
+		}
+	}
+}
+
+async function updateCustomRole(
+	{
+		api,
+		interaction,
+		kv,
+		subcommand,
+	}: ExecuteOptions<APIChatInputApplicationCommandInteraction> & {
+		subcommand: APIApplicationCommandInteractionDataSubcommandOption;
+	},
+): Promise<void> {
+	const kvKey: Deno.KvKey = [
+		"custom_role",
+		interaction.guild_id!,
+		interaction.member!.user.id,
+	];
+	const customRoleData = await kv.get<CustomRole>(kvKey);
+
+	if (!customRoleData.value) {
+		return void await api.interactions.editReply(
+			interaction.application_id,
+			interaction.token,
+			{
+				embeds: [{
+					color: config.color,
+					description: translate("custom_role_not_claimed"),
+				}],
+			},
+		);
+	} else {
+		const name = subcommand.options?.find((option) => option.name == "name")?.value! as string;
+		const color = subcommand.options?.find((option) => option.name == "color")?.value! as string;
+		const iconId = subcommand.options?.find((option) => option.name == "icon")?.value! as Snowflake;
+		if (!name && !color && !iconId) {
+			return void await api.interactions.editReply(
+				interaction.application_id,
+				interaction.token,
+				{
+					embeds: [{
+						color: config.color,
+						description: translate(
+							"custom_role_update_no_changes",
+							{
+								emoji: Deno.env.get("DISCORD_EMOJI_CONFUSED"),
+							},
+						),
+					}],
+				},
+			);
+		}
+
+		const icon = iconId
+			? (interaction.data.resolved?.attachments!)[iconId]
+			: undefined;
+
+		const guild = await api.guilds.get(interaction.guild_id!);
+
+		const isEligible = guild.features.includes(
+			GuildFeature.RoleIcons,
+		);
+
+		if (!RegExp(/^#[a-f0-9]{6}$/gi).test(color)) {
+			return void await api.interactions.editReply(
+				interaction.application_id,
+				interaction.token,
+				{
+					embeds: [{
+						color: config.color,
+						description: translate(
+							"custom_role_creation_invalid_color",
+							{
+								link: "https://imagecolorpicker.com/en",
+							},
+						),
+					}],
+					flags: MessageFlags.Ephemeral,
+				},
+			);
+		} else {
+			let iconData;
+
+			if (icon) {
+				if (isEligible) {
+					if (
+						RegExp(/^image\/(png|jpg|jpeg)$/).test(
+							icon.content_type!,
+						)
+					) {
+						return void await api.interactions.editReply(
+							interaction.application_id,
+							interaction.token,
+							{
+								content: translate(
+									"custom_role_creation_invalid_icon",
+								),
+							},
+						);
+					} else {
+						iconData = await fetch(icon.url).then((
+							response,
+						) => response.arrayBuffer());
+					}
+				} else {
+					return void await api.interactions.editReply(
+						interaction.application_id,
+						interaction.token,
+						{
+							content: translate("custom_role_icon_not_eligible"),
+						},
+					);
+				}
+			}
+
+			try {
+				await api.guilds.editRole(
+					interaction.guild_id!,
+					customRoleData.value.roleId,
+					{
+						name,
+						color: color
+							? Number(color.replace("#", "0x"))
+							: undefined,
+						icon: iconData
+							? `data:${icon?.content_type};base64,${
+								encodeBase64(iconData!)
+							}`
+							: undefined,
+					},
+				);
+
+				await api.interactions.editReply(
+					interaction.application_id,
+					interaction.token,
+					{
+						embeds: [{
+							color: config.color,
+							description: translate(
+								"custom_role_update_success",
+								{
+									emoji: Deno.env.get(
+										"DISCORD_EMOJI_SUCCESS",
+									),
 								},
 							),
 						}],

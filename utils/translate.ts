@@ -2,7 +2,7 @@ import config from "../config.json" with { type: "json" };
 
 export function translate(
 	key: keyof typeof config.texts,
-	args?: Record<string, string>,
+	args?: Record<string, string | undefined>,
 ): string {
 	const translated = config.texts[key];
 	if (translated) {
@@ -10,7 +10,7 @@ export function translate(
 		for (const [key, value] of Object.entries(args ?? {})) {
 			fixedTranslate = fixedTranslate.replaceAll(
 				RegExp(`(?<!\\\\)\{${key}\}`, "g"),
-				value,
+				value ?? "",
 			);
 		}
 

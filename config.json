@@ -1,11 +1,14 @@
 {
 	"color": 16777215,
 	"texts": {
-		"custom_role_already_claimed": "Kamu sudah klaim custom role kamu.",
-		"custom_role_creation_invalid_color": "Warna rolenya ga valid nih. Coba cari warna favoritmu di {link}.",
-		"custom_role_creation_invalid_icon": "Icon role hanya mendukung format file `jpg` dan `png`.",
-		"custom_role_creation_success": "Yey!! Custom role kamu sudah jadi. {role}",
-		"custom_role_icon_not_eligible": "Custom role dengan icon hanya tersedia untuk server yang memiliki boost level 2 atau lebih.",
+		"custom_role_already_claimed": "{emoji} | Kamu sudah klaim custom role kamu.",
+		"custom_role_creation_invalid_color": "{emoji} | Warna rolenya ga valid nih. Coba cari warna favoritmu [disini]({link}).",
+		"custom_role_creation_invalid_icon": "{emoji} | Icon role hanya mendukung format file `jpg` dan `png`.",
+		"custom_role_creation_success": "{emoji} | Yey!! Custom role kamu sudah jadi. {role}",
+		"custom_role_update_success": "{emoji} | Custom Role kamu berhasil di update",
+		"custom_role_update_no_changes": "{emoji} | Ha? Ga ada yang mau di ganti nih?",
+		"custom_role_icon_not_eligible": "{emoji} | Custom role dengan icon hanya tersedia untuk server yang memiliki boost level 2 atau lebih.",
+		"custom_role_not_claimed": "{emoji} | Kamu ga punya custom role ban. h(⁠╥⁠﹏⁠╥⁠) ",
 		"error": "Wah. ada yang salah nih, tunggu sebentar ya. Kami sudah mengirim pesan error ke developer bot untuk diinvestigasi. "
 	}
 }
