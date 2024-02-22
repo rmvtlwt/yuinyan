@@ -308,9 +308,14 @@ async function updateCustomRole(
 			},
 		);
 	} else {
-		const name = subcommand.options?.find((option) => option.name == "name")?.value! as string;
-		const color = subcommand.options?.find((option) => option.name == "color")?.value! as string;
-		const iconId = subcommand.options?.find((option) => option.name == "icon")?.value! as Snowflake;
+		const name = subcommand.options?.find((option) => option.name == "name")
+			?.value! as string;
+		const color = subcommand.options?.find((option) =>
+			option.name == "color"
+		)?.value! as string;
+		const iconId = subcommand.options?.find((option) =>
+			option.name == "icon"
+		)?.value! as Snowflake;
 		if (!name && !color && !iconId) {
 			return void await api.interactions.editReply(
 				interaction.application_id,
