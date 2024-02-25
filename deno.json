@@ -9,9 +9,10 @@
 		"entrypoint": "main.ts"
 	},
 	"imports": {
-		"@discordjs/rest": "npm:@discordjs/rest",
-		"discord_api_types": "https://deno.land/x/discord_api_types@0.37.67/v10.ts",
-		"std/": "https://deno.land/std@0.214.0/"
+		"@discordjs/core": "npm:@discordjs/core@1.1.1",
+		"@discordjs/rest": "npm:@discordjs/rest@2.2.0",
+		"discord_api_types": "https://deno.land/x/discord_api_types@0.37.68/v10.ts",
+		"std/": "https://deno.land/std@0.215.0/"
 	},
 	"lint": {
 		"rules": {
@@ -20,11 +21,13 @@
 			],
 			"include": [
 				"ban-untagged-todo",
-				"camelcase"
+				"camelcase",
+				"no-console"
 			]
 		},
 		"exclude": [
-			"manifest.gen.ts"
+			"manifest.gen.ts",
+			"*_test.ts"
 		]
 	},
 	"fmt": {
@@ -38,5 +41,8 @@
 	"tasks": {
 		"build": "deno run --allow-read --allow-write --allow-run --check build.ts",
 		"test": "deno run -A --watch --check main.ts"
-	}
+	},
+	"unstable": [
+		"kv"
+	]
 }

@@ -12,7 +12,7 @@ ${
 
 export default {
     commands: [
-        ${commandFiles.map((_context, index) => `$${index}`)}
+        ${commandFiles.map((_context, index) => `$${index}`).join(",")}
     ]
 };`;
 

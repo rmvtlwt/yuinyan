@@ -4,12 +4,14 @@ import type {
 	APIInteraction,
 	RESTPostAPIApplicationCommandsJSONBody,
 	RESTPostAPIChatInputApplicationCommandsJSONBody,
+	Snowflake,
 } from "discord_api_types";
-import { REST } from "@discordjs/rest";
+import type { API } from "@discordjs/core";
 
 export interface ExecuteOptions<Interaction extends APIInteraction> {
-	rest: REST;
+	api: API;
 	interaction: Interaction;
+	kv: Deno.Kv;
 }
 
 export interface ICommand<
@@ -30,4 +32,9 @@ export type Command = ChatInputCommand;
 
 export interface Manifest {
 	commands: Command[];
+}
+
+export interface CustomRole {
+	roleId: Snowflake;
+	members: Snowflake[];
 }
