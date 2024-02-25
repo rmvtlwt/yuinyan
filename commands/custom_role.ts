@@ -1,6 +1,4 @@
 import {
-	type APIApplicationCommandInteractionDataAttachmentOption,
-	type APIApplicationCommandInteractionDataStringOption,
 	type APIApplicationCommandInteractionDataSubcommandOption,
 	type APIChatInputApplicationCommandInteraction,
 	ApplicationCommandOptionType,
@@ -8,7 +6,6 @@ import {
 	GuildFeature,
 	InteractionResponseType,
 	MessageFlags,
-	type Snowflake,
 } from "discord_api_types";
 import type {
 	ChatInputCommand,
@@ -18,7 +15,11 @@ import type {
 
 import config from "../config.json" with { type: "json" };
 
-import { translate } from "../utils/translate.ts";
+import {
+	getAttachmentOption,
+	getStringOption,
+	translate,
+} from "../utils/mod.ts";
 import { encodeBase64 } from "std/encoding/base64.ts";
 
 export default {
@@ -103,7 +104,7 @@ export default {
 			}
 		}
 
-		action({ ...options, subcommand });
+		action({ ...options });
 		return Response.json({
 			type: InteractionResponseType
 				.DeferredChannelMessageWithSource,
@@ -116,10 +117,7 @@ async function claimCustomRole(
 		api,
 		interaction,
 		kv,
-		subcommand,
-	}: ExecuteOptions<APIChatInputApplicationCommandInteraction> & {
-		subcommand: APIApplicationCommandInteractionDataSubcommandOption;
-	},
+	}: ExecuteOptions<APIChatInputApplicationCommandInteraction>,
 ): Promise<void> {
 	const kvKey: Deno.KvKey = [
 		"custom_role",
@@ -140,15 +138,9 @@ async function claimCustomRole(
 			},
 		);
 	} else {
-		const [name, color, iconId] = (subcommand
-			.options! as (
-				| APIApplicationCommandInteractionDataStringOption
-				| APIApplicationCommandInteractionDataAttachmentOption
-			)[]).map((option) => option.value);
-
-		const icon = iconId
-			? (interaction.data.resolved?.attachments!)[iconId]
-			: undefined;
+		const name = getStringOption(interaction, "name", true);
+		const color = getStringOption(interaction, "color", true);
+		const icon = getAttachmentOption(interaction, "icon") ?? undefined;
 
 		const guild = await api.guilds.get(interaction.guild_id!);
 
@@ -284,10 +276,7 @@ async function updateCustomRole(
 		api,
 		interaction,
 		kv,
-		subcommand,
-	}: ExecuteOptions<APIChatInputApplicationCommandInteraction> & {
-		subcommand: APIApplicationCommandInteractionDataSubcommandOption;
-	},
+	}: ExecuteOptions<APIChatInputApplicationCommandInteraction>,
 ): Promise<void> {
 	const kvKey: Deno.KvKey = [
 		"custom_role",
@@ -308,15 +297,11 @@ async function updateCustomRole(
 			},
 		);
 	} else {
-		const name = subcommand.options?.find((option) => option.name == "name")
-			?.value! as string;
-		const color = subcommand.options?.find((option) =>
-			option.name == "color"
-		)?.value! as string;
-		const iconId = subcommand.options?.find((option) =>
-			option.name == "icon"
-		)?.value! as Snowflake;
-		if (!name && !color && !iconId) {
+		const name = getStringOption(interaction, "name") ?? undefined;
+		const color = getStringOption(interaction, "color") ?? undefined;
+		const icon = getAttachmentOption(interaction, "icon") ?? undefined;
+
+		if (!name && !color && !icon) {
 			return void await api.interactions.editReply(
 				interaction.application_id,
 				interaction.token,
@@ -334,17 +319,13 @@ async function updateCustomRole(
 			);
 		}
 
-		const icon = iconId
-			? (interaction.data.resolved?.attachments!)[iconId]
-			: undefined;
-
 		const guild = await api.guilds.get(interaction.guild_id!);
 
 		const isEligible = guild.features.includes(
 			GuildFeature.RoleIcons,
 		);
 
-		if (!RegExp(/^#[a-f0-9]{6}$/gi).test(color)) {
+		if (color && !RegExp(/^#[a-f0-9]{6}$/gi).test(color)) {
 			return void await api.interactions.editReply(
 				interaction.application_id,
 				interaction.token,
